@@ -8,12 +8,14 @@ public class GrabbingClaw : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     public bool grabbedPlayer = false;
     public bool grabbedGacha = false;
-    public GameObject gachaGrab; 
+    public GameObject gachaGrab;
+    private GameObject player;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = open;
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
     // Update is called once per frame
@@ -46,7 +48,7 @@ public class GrabbingClaw : MonoBehaviour
     IEnumerator resetGrab()
     {
        // spriteRenderer.sprite = closed;
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
        // spriteRenderer.sprite = open;
         grabbedPlayer = false;
     }
