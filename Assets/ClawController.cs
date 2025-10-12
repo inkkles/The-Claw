@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class ClawController : MonoBehaviour
 {
+    [SerializeField] GameObject Claw;
+
     public static ClawController Instance;
     private void Awake()
     {
@@ -16,6 +18,16 @@ public class ClawController : MonoBehaviour
         else
             Destroy(gameObject);
     }
+
+    [SerializeField] LineRenderer lineRenderer1;
+    [SerializeField] LineRenderer lineRenderer2;
+    public Material lineMaterial;
+    public float lineWidth;
+
+    public bool isOnPlayer = false;
+    private Collider col;
+    
+
     
     private Vector2 stick;
 
@@ -26,14 +38,43 @@ public class ClawController : MonoBehaviour
 
     public Vector2 xBounds;
     public Vector2 zBounds;
+    private Vector3 BackPos;
+    private Vector3 FrontPos;
+    private Vector3 LeftPos;
+    private Vector3 RightPos;
+
+    //NOTE:  Z IS RIGHT(Z-) AND LEFT(Z+)
+    //  AND  X IS FRONT(X+) AND BACK(X-)
+    private void UpdatePositionRefs()
+    {
+        BackPos = new Vector3(xBounds.y, Claw.transform.position.y, Claw.transform.position.z);
+        FrontPos = new Vector3(xBounds.x, Claw.transform.position.y, Claw.transform.position.z);
+        LeftPos = new Vector3(Claw.transform.position.x, Claw.transform.position.y, zBounds.x);
+        RightPos = new Vector3(Claw.transform.position.x, Claw.transform.position.y, zBounds.y);
+
+        lineRenderer1.SetPosition(0, new Vector3(BackPos.x, transform.position.y, BackPos.z));
+        lineRenderer1.SetPosition(1, new Vector3(FrontPos.x, transform.position.y, FrontPos.z));
+        lineRenderer1.transform.position = new Vector3(lineRenderer1.transform.position.x,
+            lineRenderer1.transform.position.y, BackPos.z);
+        lineRenderer2.SetPosition(0, new Vector3(LeftPos.x, transform.position.y, LeftPos.z));
+        lineRenderer2.SetPosition(1, new Vector3(RightPos.x, transform.position.y, RightPos.z));
+        lineRenderer2.transform.position = new Vector3(lineRenderer2.transform.position.x,
+            RightPos.y, lineRenderer2.transform.position.z);
+    }
 
     private void OnDrawGizmos()
     {
+        UpdatePositionRefs();
         //The ways these are drawn is purposely cross-like
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(new Vector3(xBounds.x, transform.position.y, transform.position.z),
-            new Vector3(xBounds.y, transform.position.y, transform.position.z));
-        Gizmos.DrawLine(new Vector3(transform.position.x, transform.position.y, zBounds.x), new Vector3(transform.position.x, transform.position.y, zBounds.y));
+        Gizmos.DrawLine(BackPos, FrontPos);
+        Gizmos.DrawLine(LeftPos, RightPos);
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(BackPos, 0.1f);
+        Gizmos.DrawSphere(RightPos, 0.1f);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(FrontPos, 0.1f);
+        Gizmos.DrawSphere(LeftPos, 0.1f);
     }
 
 
@@ -52,11 +93,16 @@ public class ClawController : MonoBehaviour
     {
         state = State.NEUTRAL;
         grabTimer = timeBetweenTries;
+        col = GetComponent<Collider>(); //our box collider that is at player level
+        
+        
+
     }
 
     
     void Update()
     {
+        
         if (state == State.GRABBING) return;
         grabTimer -= Time.deltaTime;
         
@@ -76,31 +122,33 @@ public class ClawController : MonoBehaviour
     }
 
     public float clawSpeed;
-
+    public float clawAcceleration;
 
     private float horizontal;
-
     private float vertical;
+    
+    //NOTE:  Z IS RIGHT(Z-) AND LEFT(Z+)
+    //  AND  X IS FRONT(X+) AND BACK(X-)
 
-    public float clawAcceleration;
     // claw state machine
     void LateUpdate()
     {
         switch (state)
         {
             case State.MOVING:
-                if (Mathf.Abs(stick.y) <= controllerDeadzone)
-                    horizontal = Mathf.MoveTowards(horizontal, 0, Time.deltaTime * clawAcceleration);
-                else horizontal = 0;
-                if (Mathf.Abs(stick.x) <= controllerDeadzone)
-                    vertical = Mathf.MoveTowards(vertical, 0, Time.deltaTime * clawAcceleration);
-                else vertical = 0;
-                
-                Vector3 targetPosition = new Vector3(
-                    Mathf.Clamp(transform.position.x + horizontal, xBounds.x, xBounds.y), transform.position.y,
-                    Mathf.Clamp(transform.position.z + vertical, zBounds.x, zBounds.y));
+            //logic for converting normal analog sticks into digital joystick (dont ask why i did this, i wanted controller players to feel the same as the people at the arcade machine)
+            //also for moving you move sqrt(2) times faster when going diagonally since i add vertical and horizontal distinctly
+            //(thats claw tech)
+            //vertical
+            if (Mathf.Abs(stick.y) > controllerDeadzone)
+            {
+                Claw.transform.position = Vector3.MoveTowards(Claw.transform.position, stick.y > 0 ? BackPos: FrontPos, clawSpeed * Time.deltaTime);
+            }
 
-                transform.position = targetPosition;
+            if (Mathf.Abs(stick.x) > controllerDeadzone)
+            {
+                Claw.transform.position = Vector3.MoveTowards(Claw.transform.position, stick.x > 0 ? RightPos : LeftPos, clawSpeed * Time.deltaTime);
+            }
                 break;
             case State.NEUTRAL:
                 break;
@@ -109,10 +157,13 @@ public class ClawController : MonoBehaviour
         }
     }
 
+    [SerializeField] private float grabSpeed;
     public IEnumerator Grab()
     {
-        //do grab things
-        yield return new WaitForSeconds(1f);
+        //play grab animation
+        yield return new WaitForSeconds(grabSpeed); //wait until animation is done, then start return animation
+        //check if our collider is touching the player
+        
         
         
         //finish doing grab things
