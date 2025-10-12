@@ -113,7 +113,7 @@ public class ClawController : MonoBehaviour
 
         if (state == State.GRABBING) return;
 
-        if (Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.O) && Time.timeScale != 0)
         {
             grabSound.Play();
             state = State.GRABBING;
@@ -160,6 +160,7 @@ public class ClawController : MonoBehaviour
                 //also for moving you move sqrt(2) times faster when going diagonally since i add vertical and horizontal distinctly
                 //(thats claw tech)
                 //vertical
+                UpdatePositionRefs();
                 if (Mathf.Abs(stick.y) > controllerDeadzone)
                 {
                     Claw.transform.position = Vector3.MoveTowards(Claw.transform.position, stick.y > 0 ? BackPos : FrontPos, clawSpeed * Time.deltaTime);

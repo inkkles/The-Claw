@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem.iOS;
+//using UnityEngine.InputSystem.iOS;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
         Debug.Log(Time.timeScale);
         if (!startGame)
         {
-            if (Input.GetKey(KeyCode.O) || Input.GetKey(KeyCode.P))
+            if (Input.GetKey(KeyCode.P))
             {
                 button1.color = Color.gray;
                 buttonSound.Play();
