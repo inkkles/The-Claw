@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private Collider col;
     private bool turnClockwise = true;
-    public bool isGrounded;
+    private bool isGrounded;
 
     void Start()
     {

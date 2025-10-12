@@ -21,11 +21,7 @@ public class ClawController : MonoBehaviour
     private void Awake()
     {
         if (Instance == null)
-        {
             Instance = this;
-            state = State.MOVING;
-            gameObject.transform.position = new Vector3(41.5f, 30.4f, 0.7f);
-        }
         else
             Destroy(gameObject);
     }
@@ -106,7 +102,7 @@ public class ClawController : MonoBehaviour
         state = State.NEUTRAL;
         grabTimer = timeBetweenTries;
         col = GetComponent<Collider>(); //our box collider that is at player level
-        gameObject.transform.position = new Vector3(41.5f, 30.4f, 0.7f);
+
 
 
     }
@@ -114,16 +110,15 @@ public class ClawController : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(state);
 
         if (state == State.GRABBING) return;
 
-        if (Input.GetKeyUp(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.O))
         {
-            StartCoroutine(Grab());
+            grabSound.Play();
             state = State.GRABBING;
 
-
+            StartCoroutine(Grab());
         }
         // grabTimer -= Time.deltaTime;
 
@@ -158,8 +153,6 @@ public class ClawController : MonoBehaviour
         switch (state)
         {
             case State.NEUTRAL:
-                gameObject.transform.position = new Vector3(41.5f, 30.4f, 0.7f);
-                state = State.MOVING;
                 break;
             case State.MOVING:
 
@@ -178,7 +171,6 @@ public class ClawController : MonoBehaviour
                 }
                 break;
             case State.GRABBING:
-
                 break;
         }
     }
@@ -199,7 +191,6 @@ public class ClawController : MonoBehaviour
             yield return null;
         }
         Claw.transform.position = targetPosition;
-        grabSound.Play();
         if (ClawVisual.GetComponent<GrabbingClaw>().grabbedPlayer)
         {
             isOnPlayer = true;
@@ -214,14 +205,13 @@ public class ClawController : MonoBehaviour
             //Debug.Log("HIT GACHA");
             GameObject gacha = ClawVisual.GetComponent<GrabbingClaw>().gachaGrab;
             gacha.transform.parent = Claw.transform;
-            gacha.transform.localPosition = new Vector3(gacha.transform.localPosition.x, 0, 0);
             gacha.GetComponent<Rigidbody>().isKinematic = true;
             gacha.GetComponent<Collider>().enabled = false;
             ClawVisual.GetComponent<GrabbingClaw>().grabbedGacha = false;
             ClawVisual.GetComponent<GrabbingClaw>().gachaGrab = null;
             //Instantiate(gachaPrefabs[UnityEngine.Random.Range(0, gachaPrefabs.Length)], originalPosition, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0));
-            Destroy(gacha, 2f);
-
+            Destroy(gacha, 3f);
+            
         }
         else
         {
@@ -242,9 +232,9 @@ public class ClawController : MonoBehaviour
         Claw.transform.position = originalPosition;
         if (!isOnPlayer)
         {
-            numberOfTries--;
+           numberOfTries--; 
         }
-
+        
         //play grab animation
         //yield return new WaitForSeconds(grabSpeed); //wait until animation is don
         //check if our collider is touching the player
@@ -266,7 +256,7 @@ public class ClawController : MonoBehaviour
         player.GetComponentInChildren<Animator>().SetBool("Caught", true);
         player.transform.parent = Claw.transform;
         player.transform.localPosition = new Vector3(-6.5f, 0, 0);
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(6f);
         playerIsCaught = true;
         //return null;
         // player.transform.localPosition = new Vector3(-6.5f, 0,
