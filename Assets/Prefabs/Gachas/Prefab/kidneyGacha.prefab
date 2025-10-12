@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4771998344476466815}
   m_Layer: 0
   m_Name: kidneyGacha
-  m_TagString: Untagged
+  m_TagString: Gacha
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -201,10 +201,22 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -1638237407922904103, guid: cb65465fd79854cf7b7c9ab3f00d0fab, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 4874126678125670354, guid: cb65465fd79854cf7b7c9ab3f00d0fab, type: 3}
+    - target: {fileID: -1018664272722485354, guid: cb65465fd79854cf7b7c9ab3f00d0fab, type: 3}
+      propertyPath: m_TagString
+      value: Destroy
+      objectReference: {fileID: 0}
     - target: {fileID: -895306380916907690, guid: cb65465fd79854cf7b7c9ab3f00d0fab, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: aca627a3ceefd2943863d8ad712251ad, type: 2}
+    - target: {fileID: 243041194690276544, guid: cb65465fd79854cf7b7c9ab3f00d0fab, type: 3}
+      propertyPath: m_TagString
+      value: Destroy
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: cb65465fd79854cf7b7c9ab3f00d0fab, type: 3}
       propertyPath: m_Name
       value: kidneyGacha (1)

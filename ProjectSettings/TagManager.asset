@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 3
   tags:
   - Wall
+  - Claw
+  - Gacha
+  - Destroy
+  - Angel
   layers:
   - Default
   - TransparentFX

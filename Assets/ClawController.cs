@@ -9,6 +9,13 @@ using UnityEngine.UI;
 public class ClawController : MonoBehaviour
 {
     [SerializeField] GameObject Claw;
+    [SerializeField] GameObject ClawVisual;
+    [SerializeField] GameObject OnlyCollide;
+
+    public GameObject[] gachaPrefabs;
+    public AudioSource grabSound;
+
+    public bool playerIsCaught = false;
 
     public static ClawController Instance;
     private void Awake()
@@ -26,12 +33,12 @@ public class ClawController : MonoBehaviour
 
     public bool isOnPlayer = false;
     private Collider col;
-    
 
-    
+
+
     private Vector2 stick;
 
-    [SerializeField] int numberOfTries = 3;
+    [SerializeField] public int numberOfTries = 3;
 
     [SerializeField] private float timeBetweenTries = 2f;
     [SerializeField] private float controllerDeadzone = 0.1f;
@@ -91,34 +98,44 @@ public class ClawController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        grabSound = GetComponent<AudioSource>();
         state = State.NEUTRAL;
         grabTimer = timeBetweenTries;
         col = GetComponent<Collider>(); //our box collider that is at player level
-        
-        
+
+
 
     }
 
-    
+
     void Update()
     {
-        
+
         if (state == State.GRABBING) return;
-        grabTimer -= Time.deltaTime;
-        
-        if (grabTimer <= 0)
+
+        if (Input.GetKeyDown(KeyCode.O))
         {
-            grabTimer = timeBetweenTries;
+            grabSound.Play();
             state = State.GRABBING;
+
             StartCoroutine(Grab());
         }
-        
+        // grabTimer -= Time.deltaTime;
+
+        // if (grabTimer <= 0)
+        // {
+        //     grabTimer = timeBetweenTries;
+        //     state = State.GRABBING;
+        //     StartCoroutine(Grab());
+        // }
+
         stick = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         if (stick.magnitude > controllerDeadzone)
         {
+
             state = State.MOVING;
         }
-        
+
     }
 
     public float clawSpeed;
@@ -126,7 +143,7 @@ public class ClawController : MonoBehaviour
 
     private float horizontal;
     private float vertical;
-    
+
     //NOTE:  Z IS RIGHT(Z-) AND LEFT(Z+)
     //  AND  X IS FRONT(X+) AND BACK(X-)
 
@@ -135,22 +152,23 @@ public class ClawController : MonoBehaviour
     {
         switch (state)
         {
-            case State.MOVING:
-            //logic for converting normal analog sticks into digital joystick (dont ask why i did this, i wanted controller players to feel the same as the people at the arcade machine)
-            //also for moving you move sqrt(2) times faster when going diagonally since i add vertical and horizontal distinctly
-            //(thats claw tech)
-            //vertical
-            if (Mathf.Abs(stick.y) > controllerDeadzone)
-            {
-                Claw.transform.position = Vector3.MoveTowards(Claw.transform.position, stick.y > 0 ? BackPos: FrontPos, clawSpeed * Time.deltaTime);
-            }
-
-            if (Mathf.Abs(stick.x) > controllerDeadzone)
-            {
-                Claw.transform.position = Vector3.MoveTowards(Claw.transform.position, stick.x > 0 ? RightPos : LeftPos, clawSpeed * Time.deltaTime);
-            }
-                break;
             case State.NEUTRAL:
+                break;
+            case State.MOVING:
+
+                //logic for converting normal analog sticks into digital joystick (dont ask why i did this, i wanted controller players to feel the same as the people at the arcade machine)
+                //also for moving you move sqrt(2) times faster when going diagonally since i add vertical and horizontal distinctly
+                //(thats claw tech)
+                //vertical
+                if (Mathf.Abs(stick.y) > controllerDeadzone)
+                {
+                    Claw.transform.position = Vector3.MoveTowards(Claw.transform.position, stick.y > 0 ? BackPos : FrontPos, clawSpeed * Time.deltaTime);
+                }
+
+                if (Mathf.Abs(stick.x) > controllerDeadzone)
+                {
+                    Claw.transform.position = Vector3.MoveTowards(Claw.transform.position, stick.x > 0 ? RightPos : LeftPos, clawSpeed * Time.deltaTime);
+                }
                 break;
             case State.GRABBING:
                 break;
@@ -160,15 +178,93 @@ public class ClawController : MonoBehaviour
     [SerializeField] private float grabSpeed;
     public IEnumerator Grab()
     {
+        Vector3 targetPosition = OnlyCollide.transform.position;
+        // Claw.transform.localPosition = new Vector3(0, 0, 0); 
+
+        Vector3 originalPosition = Claw.transform.position;
+        float elapsed = 0f;
+        ClawVisual.GetComponent<SpriteRenderer>().sprite = ClawVisual.GetComponent<GrabbingClaw>().open;
+        while (elapsed < grabSpeed)
+        {
+            Claw.transform.position = Vector3.Lerp(originalPosition, targetPosition, elapsed / grabSpeed);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        Claw.transform.position = targetPosition;
+        if (ClawVisual.GetComponent<GrabbingClaw>().grabbedPlayer)
+        {
+            isOnPlayer = true;
+            ClawVisual.GetComponent<SpriteRenderer>().sprite = ClawVisual.GetComponent<GrabbingClaw>().closed;
+            //Debug.Log("HIT");
+            StartCoroutine(caughtPlayer());
+        }
+        else if (ClawVisual.GetComponent<GrabbingClaw>().grabbedGacha)
+        {
+            isOnPlayer = false;
+            ClawVisual.GetComponent<SpriteRenderer>().sprite = ClawVisual.GetComponent<GrabbingClaw>().closed;
+            //Debug.Log("HIT GACHA");
+            GameObject gacha = ClawVisual.GetComponent<GrabbingClaw>().gachaGrab;
+            gacha.transform.parent = Claw.transform;
+            gacha.GetComponent<Rigidbody>().isKinematic = true;
+            gacha.GetComponent<Collider>().enabled = false;
+            ClawVisual.GetComponent<GrabbingClaw>().grabbedGacha = false;
+            ClawVisual.GetComponent<GrabbingClaw>().gachaGrab = null;
+            //Instantiate(gachaPrefabs[UnityEngine.Random.Range(0, gachaPrefabs.Length)], originalPosition, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0));
+            Destroy(gacha, 3f);
+            
+        }
+        else
+        {
+            isOnPlayer = false;
+            //Debug.Log("MISSED");
+            ClawVisual.GetComponent<SpriteRenderer>().sprite = ClawVisual.GetComponent<GrabbingClaw>().closed;
+
+        }
+        //yield return new WaitForSeconds(0.2f); //wait a moment at the bottom
+        ClawVisual.GetComponent<SpriteRenderer>().sprite = ClawVisual.GetComponent<GrabbingClaw>().closed;
+        float elapsed1 = 0f;
+        while (elapsed1 < grabSpeed)
+        {
+            Claw.transform.position = Vector3.Lerp(targetPosition, originalPosition, elapsed1 / grabSpeed);
+            elapsed1 += Time.deltaTime;
+            yield return null;
+        }
+        Claw.transform.position = originalPosition;
+        if (!isOnPlayer)
+        {
+           numberOfTries--; 
+        }
+        
         //play grab animation
-        yield return new WaitForSeconds(grabSpeed); //wait until animation is done, then start return animation
+        //yield return new WaitForSeconds(grabSpeed); //wait until animation is don
         //check if our collider is touching the player
-        
-        
-        
+
+
+
         //finish doing grab things
         state = State.NEUTRAL;
     }
 
-    
+
+    IEnumerator caughtPlayer()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        GameObject angel = GameObject.FindWithTag("Angel");
+        angel.GetComponent<Animator>().SetBool("isAfter", true);
+        player.GetComponent<PlayerController>().enabled = false;
+        player.GetComponent<Rigidbody>().isKinematic = true;
+        player.GetComponentInChildren<Animator>().SetBool("Caught", true);
+        player.transform.parent = Claw.transform;
+        player.transform.localPosition = new Vector3(-6.5f, 0, 0);
+        yield return new WaitForSeconds(6f);
+        playerIsCaught = true;
+        //return null;
+        // player.transform.localPosition = new Vector3(-6.5f, 0,
+        // player.transform.localRotation = Quaternion.Euler(player.transform.localRotation.x, 111f, player.transform.localRotation.z);
+        // Debug.Log("Caught player");
+    }
+
+
+
+
 }

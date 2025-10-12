@@ -78,13 +78,13 @@ Material:
     - _Strenght: 0.12
     - _Tiling: 400
     m_Colors:
-    - _Offset: {r: 0, g: 0, b: 0, a: 0}
-    - _Tiling: {r: 0.1, g: 0.1, b: 0, a: 0}
-    - _TintColor: {r: 1, g: 1, b: 1, a: 0.14117648}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 0.13333334}
     - _Color: {r: 1, g: 1, b: 1, a: 0.13333334}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _Offset: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.37254903, g: 0.3803922, b: 0.38431376, a: 1}
+    - _Tiling: {r: 0.1, g: 0.1, b: 0, a: 0}
+    - _TintColor: {r: 0.128, g: 0.135, b: 1, a: 0.08627451}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &1748688521998277390

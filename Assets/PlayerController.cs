@@ -24,12 +24,12 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // Toggle turn direction
-        if (Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.P))
             turnClockwise = !turnClockwise;
 
         // Jump
-        if (Input.GetKeyDown(KeyCode.P) && isGrounded)
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        // if (Input.GetKeyDown(KeyCode.P) && isGrounded)
+        //     rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
     void FixedUpdate()
