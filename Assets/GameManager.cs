@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 //using UnityEngine.InputSystem.iOS;
 using UnityEngine.SceneManagement;
@@ -14,6 +15,7 @@ public class GameManager : MonoBehaviour
     private bool startGame = false;
     private bool showingHowToPlay = false;
     private ClawController clawController;
+    public GameObject clawControlScript;
 
     public RawImage button1;
     public RawImage restart1;
@@ -59,15 +61,14 @@ public class GameManager : MonoBehaviour
         }
         else if (showingHowToPlay)
         {
-            if (Input.GetKey(KeyCode.O) || Input.GetKey(KeyCode.P))
-            {
-                //button1.color = Color.gray;
-               // buttonSound.Play();
-            }
+            
             if (Input.GetKeyUp(KeyCode.O) || Input.GetKeyUp(KeyCode.P))
             {
-                howToPlay.SetActive(false);
                 Time.timeScale = 1;
+                howToPlay.SetActive(false);
+                StartCoroutine(PlayNow());
+                //howToPlay.SetActive(false);
+                
             }
         }
         if (clawController.numberOfTries <= 0)
@@ -115,5 +116,16 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+
+    IEnumerator PlayNow()
+    {
+        
+       // yield return new WaitForSeconds(0.5f);
+        
+        yield return new WaitForSeconds(3f);
+        clawControlScript.GetComponent<ClawController>().enabled = true;
+
     }
 }
