@@ -35,23 +35,23 @@ public class GrabbingClaw : MonoBehaviour
         else if (other.CompareTag("Gacha"))
         {
             //other.transform.parent = gameObject.transform;
-          //  Debug.Log("GACHA");
+            //  Debug.Log("GACHA");
             grabbedGacha = true;
             gachaGrab = other.gameObject;
             // Debug.Log("HIT GROUND");
             //spriteRenderer.sprite = closed;
-            
-            
+
+
         }
     }
 
     IEnumerator resetGrab()
     {
-       // spriteRenderer.sprite = closed;
+        // spriteRenderer.sprite = closed;
         yield return new WaitForSeconds(2f);
-       // spriteRenderer.sprite = open;
+        // spriteRenderer.sprite = open;
         grabbedPlayer = false;
     }
-    
+
 
 }

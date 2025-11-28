@@ -201,6 +201,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -2266567952143796696, guid: 784871a53320a4e38aa9432aa3924a14, type: 3}
+      propertyPath: m_TagString
+      value: Organ
+      objectReference: {fileID: 0}
     - target: {fileID: -1018664272722485354, guid: 784871a53320a4e38aa9432aa3924a14, type: 3}
       propertyPath: m_TagString
       value: Destroy

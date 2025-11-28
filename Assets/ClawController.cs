@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -18,6 +16,7 @@ public class ClawController : MonoBehaviour
     public bool playerIsCaught = false;
 
     public static ClawController Instance;
+    public AudioSource plasticSound;
     private void Awake()
     {
         if (Instance == null)
@@ -167,6 +166,7 @@ public class ClawController : MonoBehaviour
                 //also for moving you move sqrt(2) times faster when going diagonally since i add vertical and horizontal distinctly
                 //(thats claw tech)
                 //vertical
+                UpdatePositionRefs();
                 if (Mathf.Abs(stick.y) > controllerDeadzone)
                 {
                     Claw.transform.position = Vector3.MoveTowards(Claw.transform.position, stick.y > 0 ? BackPos : FrontPos, clawSpeed * Time.deltaTime);
@@ -220,7 +220,21 @@ public class ClawController : MonoBehaviour
             ClawVisual.GetComponent<GrabbingClaw>().grabbedGacha = false;
             ClawVisual.GetComponent<GrabbingClaw>().gachaGrab = null;
             //Instantiate(gachaPrefabs[UnityEngine.Random.Range(0, gachaPrefabs.Length)], originalPosition, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0));
-            Destroy(gacha, 2f);
+            GameObject organInside = gacha.transform.GetChild(0).GetChild(0).gameObject.CompareTag("Organ") ? gacha.transform.GetChild(0).GetChild(0).gameObject : null;
+            if (organInside != null)
+            {
+                plasticSound.Play();
+                GameObject organInstance = Instantiate(organInside, new Vector3(originalPosition.x, originalPosition.y - 10, originalPosition.z), Quaternion.Euler(organInside.transform.rotation.eulerAngles.x, organInside.transform.rotation.eulerAngles.y, organInside.transform.rotation.eulerAngles.z));
+                organInstance.AddComponent<Rigidbody>();
+                organInstance.AddComponent<SphereCollider>();
+                //organInstance.GetComponent<Rigidbody>().mass = 0;
+                organInstance.GetComponent<Rigidbody>().isKinematic = false;
+                //organInstance.GetComponent<Rigidbody>().angularVelocity = new Vector3(0f, 0f, 3f);
+                // Destroy(organInstance, 3f);
+            }
+            // organInside is a child of gacha with tag 'Organ'
+            Destroy(gacha, 1.5f);
+            // Destroy(organInside, 3f);
 
         }
         else

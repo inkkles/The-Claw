@@ -124,7 +124,7 @@ public class GameManager : MonoBehaviour
         
        // yield return new WaitForSeconds(0.5f);
         
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(0.5f);
         clawControlScript.GetComponent<ClawController>().enabled = true;
 
     }

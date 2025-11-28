@@ -221,6 +221,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 189f1b23f57bc4c53adfd3d13a1193b2, type: 2}
+    - target: {fileID: 8258466855068972492, guid: 68e43e8f7b0ea46b5ba0b878b0eb73a2, type: 3}
+      propertyPath: m_TagString
+      value: Organ
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

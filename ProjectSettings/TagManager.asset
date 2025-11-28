@@ -9,6 +9,7 @@ TagManager:
   - Gacha
   - Destroy
   - Angel
+  - Organ
   layers:
   - Default
   - TransparentFX

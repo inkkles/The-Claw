@@ -227,7 +227,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: e5e134b65a8534c928354bbed4616358, type: 2}
     - target: {fileID: 7911790884919641452, guid: 615ca90009fc3451694ca409295da0f5, type: 3}
       propertyPath: m_TagString
-      value: Gacha
+      value: Organ
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
